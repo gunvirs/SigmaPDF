@@ -64,12 +64,9 @@
         rho1*phi
     );
 
-/* mod Elsa */
+
 	#include "createElsa.H"
-/* fin_mod */
-/* tmp per elsa */
 	#include "createTMP.H"
-/* fine */
 
 
 
