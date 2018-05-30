@@ -130,76 +130,31 @@
 		Info << " SIGMA "<< counter << " Solved !!!!!\n";
 		SIGMA[counter].max(0.0);
 		/////////	Riscontro problemi in alcuni campi. 
-/*
 
-		forAll(mesh.cells(),celli)
-		{
-		SIGMA[counter][celli] = (SIGMA[counter][celli] <  clipElsa) ? 0 : SIGMA[counter][celli] ;
-		}
-		SIGMA[counter].correctBoundaryConditions();
-		//////////
-		Info << "\t...done" <<endl;
-		volScalarField tmpAlpha = ALPHA[counter];
-*/
 
-		/*volScalarField tmpLimitElsa
-		(
-		IOobject
-		(
-		"tmpLimitElsa",
-		runTime.timeName(),
-		mesh
-		),
-		mesh,
-		dimensionedScalar("0", ElsaSigmaPrime.dimensions(), 0)
-		);
-		//tmpLimitElsa.internalField() =2.3249*0.0044814/pow(mesh.V(),0.3333333);//Clip per alpha 1E-4
-		tmpLimitElsa.internalField() =pow(4*3.14,1/3)*pow(3*clipAlpha,2/3)*pow(mesh.V(),-1.0/3.0);
-		tmpLimitElsa.boundaryField()=ElsaSigmaPrime.boundaryField(); */
-		//volScalarField tmpAlpha = ALPHA[counter];
 		scalar clipAlpha23=pow(3*clipAlpha,2/3);
 		forAll(mesh.cells(),celli)
 		{
-		//SIGMA[counter][celli] = (SIGMA[counter][celli] <  clipElsa) ? 0 : SIGMA[counter][celli] ;
 		SIGMA[counter][celli] = ( (SIGMA[counter][celli]+tmpElsaSigmaMin[celli]) <  2.3249*clipAlpha23/pow(mesh.V()[celli],1/3)) ? 0 : SIGMA[counter][celli] ;
 		scalar tmpSD32 = 0;
-		//tmpSD32 = ( ( (SIGMA[counter][celli]+tmpElsaSigmaMin[celli]) <  (2.3249*clipAlpha23/pow(mesh.V()[celli],1/3) ) ) || (SIGMA[counter][celli] <  clipElsa) ) ? 0 : 6.0*((ALPHA[counter][celli])*(1.0-(ALPHA[counter][celli])))/(tmpElsaSigmaMin[celli]+SIGMA[counter][celli]);
 		tmpSD32 = ( (SIGMA[counter][celli]+tmpElsaSigmaMin[celli]) <  (2.3249*clipAlpha23/pow(mesh.V()[celli],1/3) )  ) ? 0 : 6.0*((ALPHA[counter][celli])*(1.0-(ALPHA[counter][celli])))/(tmpElsaSigmaMin[celli]+SIGMA[counter][celli]);
-		//tmpSD32 = ( ( ALPHA[counter][celli] <  clipAlpha ) || (SIGMA[counter][celli] <  clipElsa) ) ? 0 : 6.0*((ALPHA[counter][celli])*(1.0-(ALPHA[counter][celli])))/(tmpElsaSigmaMin[celli]+SIGMA[counter][celli]);
 		if(counter == 0)
 		{
 		ElsaD32[celli] = ( ( (SIGMA[counter][celli]+tmpElsaSigmaMin[celli]) <  (2.3249*clipAlpha23/pow(mesh.V()[celli],1/3) ) ) ||   (tmpSD32 < clipSD32)  ) ? 0 : tmpSD32;
-
-		//ElsaD32[celli] = ( ( (SIGMA[counter][celli]+tmpElsaSigmaMin[celli]) <  (2.3249*clipAlpha23/pow(mesh.V()[celli],1/3) ) ) || (SIGMA[counter][celli] <  clipElsa) ||  (tmpSD32 < clipSD32)  ) ? 0 : tmpSD32;
-
-		//ElsaD32[celli] = ( ( ALPHA[counter][celli] <  clipAlpha  ) || (SIGMA[counter][celli] <  clipElsa) ||  (tmpSD32 < clipSD32)  ) ? 0 : tmpSD32;
 		}
 		else
 		{
 		ElsaD32[celli] += ( ( (SIGMA[counter][celli]+tmpElsaSigmaMin[celli]) <  (2.3249*clipAlpha23/pow(mesh.V()[celli],1/3) ) ) ||   (tmpSD32 < clipSD32)  ) ? 0 : tmpSD32;
-		//ElsaD32[celli] += ( ( (SIGMA[counter][celli]+tmpElsaSigmaMin[celli]) <  (2.3249*clipAlpha23/pow(mesh.V()[celli],1/3) ) ) || (SIGMA[counter][celli] <  clipElsa) ||  (tmpSD32 < clipSD32)  ) ? 0 : tmpSD32;
-
-
-		//ElsaD32[celli] += ( ( ALPHA[counter][celli] <  clipAlpha  ) || (SIGMA[counter][celli] <  clipElsa) ||  (tmpSD32 < clipSD32)  ) ? 0 : tmpSD32;
 		}
-		//PercentualeCampi +=  ( ElsaD32[celli] > 0 ) ? 1 : 0;
 		}
 		SIGMA[counter].correctBoundaryConditions();
 		ElsaD32.correctBoundaryConditions();
 		tmpElsaSigma=SIGMA[counter]+tmpElsaSigmaMin;
 		tmpElsaSigma.correctBoundaryConditions();
-		/////	Quando lavoro con il parallelo, e faccio cicli, o meglio lavoro cella per cella, devo stare attento, che devo aggiornare le boundary del mesh relativo al songolo processore
-		//SIGMA[counter].correctBoundaryConditions();
-		//////////
-		//tmpElsaSigma=SIGMA[counter]+tmpElsaSigmaMin;
-		//tmpElsaSigma.correctBoundaryConditions();
-
 
 		if(counter == 0 )
 		{
 		ElsaSigmaPrime.internalField() = SIGMA[counter];
-		//ElsaD32.internalField()=6.0*(tmpAlpha)*(1.0- (tmpAlpha) )/(tmpElsaSigmaMin+SIGMA[counter]+ElsaTiny);
-		//ElsaSigma.internalField() = tmpElsaSigma;
 		ElsaSigma.internalField() = SIGMA[counter].internalField()+tmpElsaSigmaMin.internalField();
 		ElsaSigmaRatio.internalField() = tmpElsaSigmaRatio;
 		ElsaSigmaEquil.internalField() = tmpElsaSigmaEquil;
@@ -208,8 +163,6 @@
 		else
 		{
 		ElsaSigmaPrime.internalField() += SIGMA[counter];
-		//ElsaD32.internalField() += 6.0*(tmpAlpha)*(1.0- (tmpAlpha) )/(tmpElsaSigmaMin+SIGMA[counter]+ElsaTiny);
-		//ElsaSigma.internalField() += tmpElsaSigma;
 		ElsaSigma.internalField() += SIGMA[counter].internalField()+tmpElsaSigmaMin.internalField();
 		ElsaSigmaRatio.internalField() += tmpElsaSigmaRatio;
 		ElsaSigmaEquil.internalField() += tmpElsaSigmaEquil;
@@ -218,7 +171,7 @@
 	}
 
 	ElsaSigmaPrime /= nFields;
-	//ElsaSigmaPrime.internalField() /= nFields;
+
 	ElsaSigmaPrime.max(0.0);
 	ElsaD32 /= nFields;
 	ElsaSigma 	/= nFields;
@@ -234,26 +187,10 @@
 	ElsaSigmaEquil.correctBoundaryConditions();
 	ElsaSigmaMin.correctBoundaryConditions();
 	ElsaSigmaPrime.correctBoundaryConditions();
-	////////////////////////////////// FINO QUA
-	//Apparentemente boudaryField() non cambia il valore alla boundary cioè al confine del dominio, ma solo al confine del dominio decomposto.
-	//Cioe se faccio in parallelo, con 2 cpu, e vedo il risultato, troverò che il comando cambia il valore del campo non a tutte le boudary del dominio, ma a quello tra il 
-	//il mesh0 e mesh1.
 	ElsaSigma.correctBoundaryConditions();
-	//IMP:::: BOUDARYFIELD corregge il valore della boundary ma NON IL VALORE DI CELLA, IL VALORE DI CENTRO FACCIA!!!!!!!!!!!!!!!!!
-	// Se giro in seriale (no parallel) pare che non abbia effetto
-		//ElsaSigma.boundaryField()=777;//.internalField() = tmpElsaSigma;
-	// Se Faccio correctBoundaryConditions() dopo boudaryField, quello corregge il valore alla BOUDARY tra i 2 mesh decomposti
-	// e la modifica fatta sotto scompare.
 
-	//nDropps
-	//ndrops 	/= nFields;
-	//PercentualeCampi/= nFields;
-	//ndrops.correctBoundaryConditions();
 	Info << "...done" <<endl;
-/////////////////		N Droplets
-	Info << "Inizio Numb" <<endl;
 
-		///////	Printsssssss
 /*
 
 	if (printSourceTerms)
@@ -266,14 +203,6 @@
 	}
 */
 
-
-
-
-	//PerctSigm/=nFields;
-	/*forAll(mesh.cells(),celli)
-	{
-	ElsaD32[celli] =  (  PerctSigm[celli] < 0.51  ) ? 0 : ElsaD32[celli] ;
-	}*/
 	forAll(mesh.cells(),celli)
 	{
 	ndrops[celli] =  (ElsaD32[celli] > clipSD32) ? alpha1[celli]*6*mesh.V()[celli]/(constant::mathematical::pi*pow(ElsaD32[celli],3)) : 0 ;

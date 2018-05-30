@@ -10,18 +10,25 @@
 		    IOobject::NO_WRITE
 		)
 	);
-	//scalar clipElsa = 100;
+
 	scalar clipElsa(PDFProperties.lookupOrDefault<scalar>("clipElsa", 100));
-	//scalar clipAlpha = 1E-5;
+
 	scalar clipAlpha(PDFProperties.lookupOrDefault<scalar>("clipAlpha", 1e-5));
-	//scalar clipSD32 = 1E-6;
+
 	scalar clipSD32(PDFProperties.lookupOrDefault<scalar>("clipSD32", 1e-6));
-	// Fattore premoltiplicativo per la diffusione turbolenta: praticamente se il rapporto tra i flussi di q.d.m. e' molto alto, bisogna ridurre questo fattore. Non sono sicuro se solo per la parte stocastica o per tutto.
+	// Premultiplimative factor for tuebolent diffusion
+	// Default value is 1
+	// Effect of density (or better momentum flux) ratio should be checked.
+	// This parameter has this goal.
 	scalar qWiener(PDFProperties.lookupOrDefault<scalar>("qWiener", 1));
 	//scalar qWiener(PDFProperties.lookupOrDefault<scalar>("qWiener", rho1.value()/rho2.value()));
 	//BOOLEAN operator to decide if calculate or not dissipation turbulence rate EPS (CHECK Ruiz et al. ,2015,Physics of Fluids, 27 (4) , EQ 16 )
 	// This is done to evaluate Integral Length Scale l_t = c_0 * TurbulentKineticEnergy^(3/2)/EPS ;
-	bool	calcTurb(PDFProperties.lookupOrDefault<bool>("calcTurb", true));
+	bool	calcTurb(PDFProperties.lookupOrDefault<bool>("calcTurb", false));
+
+
+	//BOOLEAN operator to decide if evaluet second statistical moment from stochastic fields
+	bool	calcTurb(PDFProperties.lookupOrDefault<bool>("calcSM", false));
 
 	bool	printSourceTerms(PDFProperties.lookupOrDefault<bool>("printSourceSigma", false));
 
@@ -113,4 +120,53 @@
 			)
 		);
 	}
+	////////////////////	2ND MOMENTS
+	volScalarField alphaVariance
+	(
+	IOobject
+	(
+		"alphaVariance",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,//NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionSet(0, 0, 0, 0, 0,0,0),
+	"zeroGradient"
+	);
+
+	volScalarField sigmaPrimeVariance
+	(
+	IOobject
+	(
+		"sigmaPrimeVariance",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,//NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionSet(0, -2, 0, 0, 0,0,0),
+	"zeroGradient"
+	);
+
+	/////////////////////	Calculation Turbulence Properties
+	volScalarField dissip
+	(
+	IOobject
+	(
+		"dissip",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,//NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionSet(0, 2, -3, 0, 0,0,0),
+	"zeroGradient"
+	);
+
+
+
 

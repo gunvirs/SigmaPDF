@@ -1,7 +1,4 @@
 ///////////////////////////////////////////////////
-	// Modifica del 30 01 : Il problema e' che diverge. Diverge solo quella della superficie. 
-	// questo problema e' sorto quando ho messo i termini sorgenti funzione di SIGMA[counter] stesso .
-	// 
     surfaceScalarField rhoPhiSum
     (
         IOobject
@@ -71,5 +68,5 @@
     );
 
 
-	////////////////////////////////// end tmp
+	////////////////////////////////// end 
 

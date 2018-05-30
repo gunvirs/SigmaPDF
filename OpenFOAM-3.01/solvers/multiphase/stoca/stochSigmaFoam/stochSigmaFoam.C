@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 	Info << "Now Sigma" << endl;
 
 	#include "sigmaPrimeEqn.H"
-
+	#include "secondmoment.H"
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
                 turbulence->correct();
             }
         }
+	#include "turb.H"
 
         runTime.write();
 
