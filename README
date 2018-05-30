@@ -1,4 +1,11 @@
 
 3.01	sigma-pdf version	giovanni
-shgdajhsgdjhs
-editing readme file
+
+In the following repository the latest version of the code is proposed.
+The code is based on the Sigma-Y-PDF model, see:
+Navarro-Martinez, S. "Large eddy simulation of spray atomization with a probability density function method." International Journal of Multiphase Flow 63 (2014): 11-22.
+
+Until now, the code is ready for the version 3.0 of OpenFOAM. 
+One day will be ready also for newest versions.
+
+
