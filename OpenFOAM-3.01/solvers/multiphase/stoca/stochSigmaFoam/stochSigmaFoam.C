@@ -34,7 +34,7 @@ Description
 #include "fvCFD.H"
 #include "MULES.H"
 #include "subCycle.H"
-#include "incompressibleTwoPhaseMixture.H"
+#include "immiscibleIncompressibleTwoPhaseMixture.H"
 #include "turbulentTransportModel.H"
 #include "pimpleControl.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
 	#include "wiener.H"
 
-	for// or forAll....
+	for// or forAll(ALPHA,ALPHA.sizes)
 	(
 	int counter = 0 ;
 	counter < nFields;
@@ -85,18 +85,19 @@ int main(int argc, char *argv[])
 	        #include "alphaTot.H"
 	}
 
-	alpha1.internalField() /= nFields;
+	alpha1 /= nFields;
 	rhoPhi /= nFields;
 
-	alpha1.max(0.0);//Credo che questo sia un problema
+	alpha1.max(0.0);
 	alpha1.min(1.0);
 	alpha2 = 1.0 - alpha1;
-	//////
+
 	alpha1.correctBoundaryConditions();
-	//////
+
 	rho = alpha1*rho1 + alpha2*rho2;
+
 	Info << "Now Sigma" << endl;
-	//////////////////
+
 	#include "sigmaPrimeEqn.H"
 
         // --- Pressure-velocity PIMPLE corrector loop

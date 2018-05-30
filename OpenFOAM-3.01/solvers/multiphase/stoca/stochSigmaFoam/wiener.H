@@ -5,17 +5,16 @@
 	// Formarly, the qiener term should be a Gaussian random variable N(0,dT), but to obtain a proper gaussian distribution the number of stochastic fields 
 	// must be high. This procedure is cheaper because allows to obtain the same N(0,dT) with few nFields.
 
-	// Initialise the Wiener Term	 -- Vedi Yuri
+	// Initialise the Wiener Term	 
 	//- New object of class Random
 
 	// - time step
 
 	dimensionedScalar overSqrtDeltaT = 1/sqrt(runTime.deltaT());
-	dimensionedVector wienerAverage =  vector::zero*overSqrtDeltaT;
-	//Random obj(1);
-	Random obj(mesh.time().value()*100000000);
-	scalar intRand = ( (obj.scalar01())  >= 0.5 ? (1) : (0)  )*2 -1;
 
+	//Random obj(1);
+	Random obj(mesh.time().value()*10000000000);
+	
 	int counter;
 	if (nFields==1)
 	{
@@ -35,8 +34,6 @@
 			dWdt[counter] =	Foam::vector(1,0,0)*(((obj.scalar01())>= 0.5 ? (1) : (0))*2 -1)*overSqrtDeltaT+Foam::vector(0,1,0)*(((obj.scalar01())>= 0.5 ? (1) : (0))*2 -1)*overSqrtDeltaT+Foam::vector(0,0,1)*(((obj.scalar01())>= 0.5 ? (1) : (0))*2 -1)*overSqrtDeltaT;
 
 			dWdt[(nFields/2)+counter] = -dWdt[counter];
-			wienerAverage += dWdt[counter]+dWdt[(nFields/2)+counter];
+
 		}
-		wienerAverage /= nFields;
-		Info<< "Media Wiener = " << wienerAverage.value() << nl << endl;
 	}

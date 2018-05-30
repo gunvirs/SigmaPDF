@@ -108,7 +108,7 @@
             IOobject::NO_WRITE
         )
     );
-    
+    /*
     volScalarField cellVol
     (
         IOobject
@@ -123,7 +123,7 @@
        dimensionSet(0,3,0,0,0,0,0),
        "zeroGradient"
     );
-
+	*/
 
 
     dimensionedScalar CstElsaSigmaMin(ElsaProperties.lookup("CstElsaSigmaMin"));
@@ -142,3 +142,20 @@
     dimensionedScalar ElsaTinyJap("ElsaTinyJap",dimensionSet(0,2,-1,0,0,0,0),1.e-8);
     dimensionedScalar kTiny("kTiny",dimensionSet(0,2,-2,0,0,0,0),1.e-1);
     dimensionedScalar sigmaTiny("sigmaTiny",dimensionSet(0,-1,0,0,0,0,0),1.e-1);
+    //////////	Number of Droplets   //////////
+
+    volScalarField ndrops
+    (
+        IOobject
+        (
+            "ndrops",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+       dimensionSet(0,0,0,0,0,0,0),
+       "zeroGradient"
+    );
+

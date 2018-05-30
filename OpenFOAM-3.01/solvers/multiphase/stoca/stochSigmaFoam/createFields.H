@@ -29,7 +29,8 @@
     #include "createPhi.H"
 
     Info<< "Reading transportProperties\n" << endl;
-    incompressibleTwoPhaseMixture mixture(U, phi);
+    //incompressibleTwoPhaseMixture mixture(U, phi);
+	immiscibleIncompressibleTwoPhaseMixture mixture(U, phi);
 
     volScalarField& alpha1(mixture.alpha1());
     volScalarField& alpha2(mixture.alpha2());
@@ -39,13 +40,17 @@
 
     dimensionedScalar Dab("Dab", dimViscosity, mixture);
 
-    // Read the reciprocal of the turbulent Schmidt number
+    // Read the reciprocal of the turbulent Schmidt stoc0702
     dimensionedScalar alphatab("alphatab", dimless, mixture);
 
     // Need to store rho for ddt(rho, U)
     volScalarField rho("rho", alpha1*rho1 + alpha2*rho2);
     rho.oldTime();
 
+
+    // Mass flux
+    // Initialisation does not matter because rhoPhi is reset after the
+    // alpha1 solution before it is used in the U equation.
     surfaceScalarField rhoPhi
     (
         IOobject
@@ -60,11 +65,12 @@
     );
 
 /* mod Elsa */
-    #include "createElsa.H"
+	#include "createElsa.H"
 /* fin_mod */
-/* CAMPI STOCA */
-	#include "createStoca.H"
+/* tmp per elsa */
+	#include "createTMP.H"
 /* fine */
+
 
 
     // Construct incompressible turbulence model
@@ -72,6 +78,9 @@
     (
         incompressible::turbulenceModel::New(U, phi, mixture)
     );
+/* CAMPI STOCA */
+	#include "createStoca.H"
+/* fine */
 
     Info<< "Calculating field g.h\n" << endl;
     volScalarField gh("gh", g & mesh.C());

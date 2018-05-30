@@ -10,12 +10,28 @@
 		    IOobject::NO_WRITE
 		)
 	);
+	//scalar clipElsa = 100;
+	scalar clipElsa(PDFProperties.lookupOrDefault<scalar>("clipElsa", 100));
+	//scalar clipAlpha = 1E-5;
+	scalar clipAlpha(PDFProperties.lookupOrDefault<scalar>("clipAlpha", 1e-5));
+	//scalar clipSD32 = 1E-6;
+	scalar clipSD32(PDFProperties.lookupOrDefault<scalar>("clipSD32", 1e-6));
+	// Fattore premoltiplicativo per la diffusione turbolenta: praticamente se il rapporto tra i flussi di q.d.m. e' molto alto, bisogna ridurre questo fattore. Non sono sicuro se solo per la parte stocastica o per tutto.
+	scalar qWiener(PDFProperties.lookupOrDefault<scalar>("qWiener", 1));
+	//scalar qWiener(PDFProperties.lookupOrDefault<scalar>("qWiener", rho1.value()/rho2.value()));
+	//BOOLEAN operator to decide if calculate or not dissipation turbulence rate EPS (CHECK Ruiz et al. ,2015,Physics of Fluids, 27 (4) , EQ 16 )
+	// This is done to evaluate Integral Length Scale l_t = c_0 * TurbulentKineticEnergy^(3/2)/EPS ;
+	bool	calcTurb(PDFProperties.lookupOrDefault<bool>("calcTurb", true));
 
+	bool	printSourceTerms(PDFProperties.lookupOrDefault<bool>("printSourceSigma", false));
+
+
+
+	Info << "clipSD32 \t" << clipSD32 << "\tclipAlpha \t" << clipAlpha<< endl;
 	//Number of stocastic Fields
 
         scalar nFields(readScalar(PDFProperties.lookup("nFields")));
 
-	//Preso spunto da https://www.cfd-online.com/Forums/openfoam-programming-development/119642-define-array-volvectrofield-type.html
 
 	PtrList <volScalarField> ALPHA(nFields);
 	PtrList <volScalarField> SIGMA(nFields);
@@ -86,7 +102,7 @@
 					runTime.timeName(),
 					mesh,
 					IOobject::NO_READ,
-					IOobject::AUTO_WRITE
+					IOobject::NO_WRITE//AUTO_WRITE
 				),
 				dimensionedVector
 				(
