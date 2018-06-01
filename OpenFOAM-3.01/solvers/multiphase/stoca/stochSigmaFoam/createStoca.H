@@ -28,7 +28,7 @@
 
 
 	//BOOLEAN operator to decide if evaluet second statistical moment from stochastic fields
-	bool	calcTurb(PDFProperties.lookupOrDefault<bool>("calcSM", false));
+	bool	calcSM(PDFProperties.lookupOrDefault<bool>("calcSM", false));
 
 	bool	printSourceTerms(PDFProperties.lookupOrDefault<bool>("printSourceSigma", false));
 
