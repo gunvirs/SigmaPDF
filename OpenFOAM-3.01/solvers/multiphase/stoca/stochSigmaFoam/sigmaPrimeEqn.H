@@ -14,11 +14,7 @@
 		tmpElsaSigmaEquil *= scalar(0);tmpElsaSigmaEquil.correctBoundaryConditions();
 		tmpElsaSigma *= scalar(0);tmpElsaSigma.correctBoundaryConditions();
 		tmpElsaSigmaRatio *= scalar(0);tmpElsaSigmaRatio.correctBoundaryConditions();
-	//Info << "MAX e MIN vari \n "  <<max(tmpElsaSigmaMin).value()  << max(tmpElsaSigma).value()  << max(tmpElsaSigmaEquil).value()  << max(tmpElsaSigmaRatio).value()  << endl;
 
-	Info << "clipSD32 \t" << clipSD32 << "\tclipAlpha \t" << clipAlpha<< endl ;
-
-////////////////////////////////////////// end tmp
 	Info << "compute Elsa SigmaMin ..." << endl;
 
 	tmpElsaSigmaMin.internalField()=CstElsaSigmaMin*sqrt(ALPHA[counter]*(1.-ALPHA[counter]))*pow(mesh.V(),-1.0/3.0);
@@ -53,46 +49,18 @@
 	tmpElsaSigma.internalField()=SIGMA[counter].internalField()+tmpElsaSigmaMin.internalField();
 	tmpElsaSigma.internalField()=max(tmpElsaSigma.internalField(),0.0);
 	tmpElsaSigma.correctBoundaryConditions();
-	//QUANDO sono in parallelo, e lavoro su buondaryField(), lavora sulle boundary del mesh totale o solo sulla 
-	//tmpElsaSigma.boundaryField()=666;//SIGMA[counter].boundaryField();//Cioe' ho paura che praticamente, non inizializzando a dovere i campi anche sulle boundary, poi si sputtani il tutto
+
 
 	Info << "compute Elsa Ratio ..." << endl;
-	// 12 Marzo::: Tolgo il MAX
-	//tmpElsaSigmaRatio.internalField()=(max((tmpElsaSigma/(tmpElsaSigmaEquil+sigmaTiny)),1.));
+
 	tmpElsaSigmaRatio.internalField()=(max((SIGMA[counter]/(tmpElsaSigmaEquil+sigmaTiny)),1.));
 	tmpElsaSigmaRatio.correctBoundaryConditions();
-	//	28 Feb ::: Qst Un Problema?
-	//tmpElsaSigmaRatio.boundaryField()=SIGMA[counter].boundaryField();
-	//9 Marzo : creo un Termine sorgente del tutto esplicito e sti grandissimi cazzi
-	// PS: la k usata dovrebbe essere quella risolta secondo il modello, non quella SGS. Controllare Please questa turbulence->()
-	//volScalarField  SourceElsa(CTurbElsaSigmaPrime*SIGMA[counter]*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*(1));//-(SIGMA[counter]/tmpElsaSigmaEquil+sigmaTiny)));
-	//Questa formulazione sotto diverge....credo che vada a zero in qualche modo;
-	//Pout << "Hello from processor " << Pstream::myProcNo() << "for SIgmaEquil, \n the MAX " << max(tmpElsaSigmaEquil.value()) << " the min " << min (tmpElsaSigmaEquil.value()) << endl;
 
-	//volScalarField  SourceElsa(CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*SIGMA[counter]*(1-(SIGMA[counter]/(tmpElsaSigmaEquil+sigmaTiny))));
-
-	// Nel Caso diverga ancora, faccio come sotto
-	//Lo pongo inizialmente pari a zero, e poi lo calcolo per bene solo se SigmaEquil != 0
-	// Il problema credo non e' dovuto al fatto che mi diverge il calcolo di source elsa di per se, tanto che mi diverge il sistema matriciale.
-	// Se SigmaEquil --> 0, sto termine tende all'infinito.
-	// 
-	//volScalarField  SourceElsa(0);
-	//volScalarField  SourceElsa(CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*SIGMA[counter]*(1-(SIGMA[counter]/(tmpElsaSigmaEquil+sigmaTiny))));
-	//forAll(mesh.cells(),celli)
-	//{
-	//SourceElsa[celli] = (tmpElsaSigmaEquil[celli] == 0) ? 0 : SourceElsa[celli]   ;
-	//}
-
-	//SourceElsa = CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*SourceElsa;
-
-	// Linearizzazione temporale secondo SNM \dot{S}/(1-\Delta t * \partial \dot{S} / \partial Sigma)
-
-	//volScalarField  SourceElsa(CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*SIGMA[counter]*(1-(SIGMA[counter]/(tmpElsaSigmaEquil+sigmaTiny)))/(1 - runTime.deltaT()*CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*(1-2*((SIGMA[counter]/(tmpElsaSigmaEquil+sigmaTiny))))));
 	volScalarField  SourceElsa(CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*tmpElsaSigma*(1-(tmpElsaSigma/(tmpElsaSigmaEquil+sigmaTiny)))/(1 - runTime.deltaT()*CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*(1-2*((tmpElsaSigma/(tmpElsaSigmaEquil+sigmaTiny))))));
+
 	SourceElsa.correctBoundaryConditions();
 
-
-	Info << "... done" << endl;
+	Info << "... done preparation" << endl;
 
 		word sigmaScheme("div(phi,ElsaSigmaPrime)");
 		Info << "Preparin to solve SIGMA "<< counter << " ..." ;
@@ -105,32 +73,16 @@
 			Dab + alphatab*turbulence->nut(), SIGMA[counter],
 			"laplacian(Dab,ElsaSigmaPrime)"
 			)
-			-Foam::sqrt((2/qWiener)*alphatab*turbulence->nut())*(fvc::grad(SIGMA[counter]) & dWdt[counter])//Stochastic term
-			//-Foam::sqrt(2*alphatab*turbulence->nut())*(fvc::grad(SIGMA[counter]) & dWdt[counter])//Stochastic term
-
-			// IN QUESTO MODO DOVREI ESSERE CAPACE ANCHE DI FARE QUALCHE MODELLO PIU' GENERICO
+			-Foam::sqrt((2/qWiener)*alphatab*turbulence->nut())*(fvc::grad(SIGMA[counter]) & dWdt[counter])
 			==  SourceElsa
 		);
-			/*
-			//CLASSICI SOURCE TERMSSSSSS
-			== (CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*(tmpElsaSigmaRatio))*(tmpElsaSigmaEquil-tmpElsaSigmaMin )
-			+fvm::Sp(-CTurbElsaSigmaPrime* (turbulence->k()/(ElsaTinyJap+turbulence->nut())) *(tmpElsaSigmaRatio),SIGMA[counter])
-			//Il termine sorgente nella trasposizione classica di elsa e' stato linearizzato e diviso in parte implicita ed esplicita. Ls parte implicita 
-			// Un altra idea potrebbe essere l'utilizzo del cosidetto SuSp::::: vedi link
-			//    http://openfoamwiki.net/index.php/HowTo_Adding_a_new_transport_equation
-			// Solo che per come l'hanno formulato I franzosi, sto SigmaRatio al sotto a uno non ci va, quindi ho sempre il termine con SP negativo (SigmaRatio non sarà minore di uno) e quindi sempre implicito. Devo capire se il termine sorgente e' corretto o meno.
-			*/
-
-
 
 		ElsaSigmaPrimeEqn.relax();
 		Info << "... Solving SIGMA "<< counter << " ...\n";
 		ElsaSigmaPrimeEqn.solve();
-		//	HERE:::::::::: vedi note
+
 		Info << " SIGMA "<< counter << " Solved !!!!!\n";
 		SIGMA[counter].max(0.0);
-		/////////	Riscontro problemi in alcuni campi. 
-
 
 		scalar clipAlpha23=pow(3*clipAlpha,2/3);
 		forAll(mesh.cells(),celli)
@@ -189,28 +141,11 @@
 	ElsaSigmaPrime.correctBoundaryConditions();
 	ElsaSigma.correctBoundaryConditions();
 
-	Info << "...done" <<endl;
-
-/*
-
-	if (printSourceTerms)
-	{
-	//SnonLin = SIGMA[counter]*(1-(SIGMA[counter]/(tmpElsaSigmaEquil+sigmaTiny)));
-	SnonLin= tmpElsaSigma*(1-(tmpElsaSigma/(tmpElsaSigmaEquil+sigmaTiny)));
-	SLin	=  SourceElsa;
-	//SLinCappato	=  CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*SIGMA[counter]*(1-tmpElsaSigmaRatio)/(1 - runTime.deltaT()*CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*(1-2*tmpElsaSigmaRatio));
-	//SLinCappato	=  CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*tmpElsaSigma*(1-tmpElsaSigmaRatio)/(1 - runTime.deltaT()*CTurbElsaSigmaPrime*(turbulence->k()/(ElsaTinyJap+turbulence->nut()))*(1-2*tmpElsaSigmaRatio));
-	}
-*/
-
 	forAll(mesh.cells(),celli)
 	{
 	ndrops[celli] =  (ElsaD32[celli] > clipSD32) ? alpha1[celli]*6*mesh.V()[celli]/(constant::mathematical::pi*pow(ElsaD32[celli],3)) : 0 ;
 	ElsaD32[celli] =  (ElsaD32[celli] > clipSD32) ? ElsaD32[celli] : 0 ;
-	//ElsaD32[celli] =  ( (ElsaD32[celli] > 1E-6) && (PercentualeCampi > 0.51) ) ? ElsaD32[celli] : 0 ;
 	}
-	Info << "Finisco Numb" <<endl;
 	ndrops.correctBoundaryConditions();
 	ElsaD32.correctBoundaryConditions();
-	//ElsaD32.correctBoundaryConditions();
 }
