@@ -1,0 +1,4 @@
+klein.C
+
+LIB = $(FOAM_USER_LIBBIN)/libkleinInflowGenerator
+
