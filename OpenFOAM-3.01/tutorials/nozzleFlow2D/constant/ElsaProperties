@@ -1,0 +1,36 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.4.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      ElsaProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+CstElsaSigmaMin    CstElsaSigmaMin [0 0 0 0 0 0 0] 2.4;
+
+ElsaSurfaceTensionCoef   ElsaSurfaceTensionCoef [1 0 -2 0 0 0 0] 0.0261;
+
+// Value from B. Duret IJMF 2013
+
+// model for equilibriume surface density choice between 
+//Lebas IJMF 2009 ==> webEquilMod=0.
+//webEquilMod webEquilMod[[0 0 0 0 0 0 0] 0.;
+//ElsaWeberEquil   ElsaWeberEquil [0 0 0 0 0 0 0] 1.;
+//CTurbElsaSigmaPrime CTurbElsaSigmaPrime [0 0 0 0 0 0 0] 1.;
+//  and Duret IJMF 2013  ==> webEquilMod=1.
+webEquilMod webEquilMod [0 0 0 0 0 0 0] 1.;
+ElsaWeberEquil   ElsaWeberEquil [0 0 0 0 0 0 0] 1.5;
+CTurbElsaSigmaPrime CTurbElsaSigmaPrime [0 0 0 0 0 0 0] 0.4;
+
+
+// ************************************************************************* //
