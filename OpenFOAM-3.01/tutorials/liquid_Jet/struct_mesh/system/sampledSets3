@@ -1,0 +1,119 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+/*
+totalLiquid0
+{
+    type volumeIntegrate;
+    verbose true;
+        outputControl   timeStep;
+    fields ( alpha1_.0 );
+}
+
+
+totalLiquid1
+{
+    type volumeIntegrate;
+    verbose true;
+        outputControl   timeStep;
+    fields ( alpha1_.1 );
+}
+
+
+totalLiquid2
+{
+    type volumeIntegrate;
+    verbose true;
+        outputControl   timeStep;
+    fields ( alpha1_.2 );
+}
+
+
+totalLiquid3
+{
+    type volumeIntegrate;
+    verbose true;
+        outputControl   timeStep;
+    fields ( alpha1_.3 );
+}
+
+totalLiquid4
+{
+    type volumeIntegrate;
+    verbose true;
+        outputControl   timeStep;
+    fields ( alpha1_.4 );
+}
+*/
+
+volFlow
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           outlet;
+	aliases{ alpha alpha.water; }
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+}
+
+volFlow1
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           outlet;
+	aliases{ alpha alpha1_.1; }
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+}
+
+volFlow2
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           outlet;
+	aliases{ alpha alpha1_.8; }
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+}
+
+lateralFl
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           lateral;
+	aliases{ alpha alpha.water; }
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+}
+
+gocce
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           outlet;
+    verbose             true;
+    //expression          "ElsaSD32*U.x*(ElsaSD32>1e-05 ? ElsaSD32 : 0 )";
+    expression          "ElsaSD32*U&Sf()";//*(ElsaSD32>1e-05 ? ElsaSD32 : 0 )";
+    accumulations       ( sum );
+}
+
+goccelateral
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           lateral;
+    verbose             true;
+    //expression          "ElsaSD32*U.x*(ElsaSD32>1e-05 ? ElsaSD32 : 0 )";
+    expression          "ElsaSD32*U&Sf()";//*(ElsaSD32>1e-05 ? ElsaSD32 : 0 )";
+    accumulations       ( sum );
+}
+// ************************************************************************* //
+

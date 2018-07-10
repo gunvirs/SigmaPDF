@@ -1,0 +1,201 @@
+// Parametrized case by Giovanni Tretola
+
+//Run using:
+//m4 -P system/blockMeshDict.m4 > system/blockMeshDict
+
+//m4 definitions:
+
+
+
+
+
+//Mathematical constants:
+
+
+//Geometry
+	// [mm] -->100micron
+
+//m4_define(dTot,calc(dinj*20))
+
+
+
+
+//m4_define(rL,4)
+
+//Geometry
+
+
+//m4_define(r1,calc((dinj/5)/2))
+
+
+
+
+
+
+//m4_define(length, calc(dinj*35))
+
+//Grid points (integers!):
+
+//Vedi schema 
+//m4_define(nC, 10)//5)	//numero di Liquid Inlet	//al massimo 6
+//5)	//numero di Liquid Inlet -- Dx 0.01 mm
+	//
+
+
+//Grading
+//m4_define(rGrading1, 1)
+
+//m4_define(rGrading2, 1)//--> Ho un secondo cerchio nella sezione di ingresso per non forzare una asimmetria nel getto. 
+//1/7.1753	//	1/0.1394
+
+
+//Plane E:
+
+
+
+
+//m4_define(rRelEc, 0.8)
+
+//Plane F:
+
+
+
+
+//m4_define(rRelFc, 0.8)
+
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          blockMeshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 0.001;
+
+vertices
+(
+
+
+//Plane E:
+//Central O-grid
+(0.0353553395329987 -0.0353553385856561 0) // Vertex E0 = 0 
+(0.0353553395329987 0.0353553385856561 0) // Vertex E1 = 1 
+(-0.0353553395329987 0.0353553385856561 0) // Vertex E2 = 2 
+(-0.0353553395329987 -0.0353553385856561 0) // Vertex E3 = 3 
+//4 block rounding
+(0.707106790659974 -0.707106771713121 0) // Vertex E4 = 4 
+(0.707106790659974 0.707106771713121 0) // Vertex E5 = 5 
+(-0.707106790659974 0.707106771713121 0) // Vertex E6 = 6 
+(-0.707106790659974 -0.707106771713121 0) // Vertex E7 = 7 
+
+//	plane F
+//Central O-grid
+(0.0353553395329987 -0.0353553385856561 5) // Vertex F0 = 8 
+(0.0353553395329987 0.0353553385856561 5) // Vertex F1 = 9 
+(-0.0353553395329987 0.0353553385856561 5) // Vertex F2 = 10 
+(-0.0353553395329987 -0.0353553385856561 5) // Vertex F3 = 11 
+//4 block rounding
+(0.707106790659974 -0.707106771713121 5) // Vertex F4 = 12 
+(0.707106790659974 0.707106771713121 5) // Vertex F5 = 13 
+(-0.707106790659974 0.707106771713121 5) // Vertex F6 = 14 
+(-0.707106790659974 -0.707106771713121 5) // Vertex F7 = 15 
+
+);
+
+// Defining blocks:
+blocks
+(
+
+    // ------------------  Blocks between plane E and plane F  --------------------------
+
+    //Blocks between plane E and plane F:
+    // Central Block
+    // block0 - positive x O-grid block
+    hex (5 1 0 4 13 9 8 12 ) EF (30 10 250) simpleGrading (0.1394 1 1)
+    // block1 - positive y O-grid block
+    hex (6 2 1 5 14 10 9 13 ) EF (30 10 250) simpleGrading (0.1394 1 1)
+    // block2 - negative x O-grid block
+    hex (7 3 2 6 15 11 10 14 ) EF (30 10 250) simpleGrading (0.1394 1 1)
+    // block3 - negative y O-grid block
+    hex (4 0 3 7 12 8 11 15 ) EF (30 10 250) simpleGrading (0.1394 1 1)
+    // block4 - central O-grid block
+    hex (0 1 2 3 8 9 10 11 ) EF (10 10 250) simpleGrading (1 1 1)
+
+);
+
+edges
+(
+
+    //  - - - -  Plane E  - - - -
+    arc 0 1 (0.05 0 0)
+    arc 1 2 (0 0.05 0)
+    arc 2 3 (-0.05 0 0)
+    arc 3 0 (0 -0.05 0)
+    arc 4 5 (1 0 0)
+    arc 5 6 (0 1 0)
+    arc 6 7 (-1 0 0)
+    arc 7 4 (0 -1 0)
+
+    //  - - - -  Plane F  - - - -
+    arc 8 9 (0.05 0 5)
+    arc 9 10 (0 0.05 5)
+    arc 10 11 (-0.05 0 5)
+    arc 11 8 (0 -0.05 5)
+    arc 12 13 (1 0 5)
+    arc 13 14 (0 1 5)
+    arc 14 15 (-1 0 5)
+    arc 15 12 (0 -1 5)
+
+);
+
+// Defining patches:
+patches
+(
+    wall inletL //INLET nDec --> fissate come wall 
+	(
+      /* (1 5 4 0)
+       (2 6 5 1)
+       (3 7 6 2)
+       (0 4 7 3)*/
+       (3 2 1 0)
+   )
+    patch wallInlet //seconAirInlet  Blocchi attorno
+    (
+       (1 5 4 0)
+       (2 6 5 1)
+       (3 7 6 2)
+       (0 4 7 3)
+    )
+
+
+
+    patch outlet 
+    (
+       (9 13 12 8)
+       (10 14 13 9)
+       (11 15 14 10)
+       (8 12 15 11)
+       (11 10 9 8)
+    )
+
+    wall lateral
+    (	
+       (4 5 13 12)
+       (5 6 14 13)
+       (6 7 15 14)
+       (7 4 12 15)
+    )
+);
+
+// ************************************************************************* //

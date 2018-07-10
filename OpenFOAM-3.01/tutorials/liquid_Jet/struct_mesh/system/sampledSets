@@ -1,0 +1,34 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+totalLiquid
+{
+    type volumeIntegrate;
+    verbose true;
+        outputControl   timeStep;
+    fields ( alpha.fuel );
+}
+
+volFlow
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           outlet;
+    
+aliases{
+alpha alpha.fuel;
+}
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+}
+
+
+// ************************************************************************* //
+

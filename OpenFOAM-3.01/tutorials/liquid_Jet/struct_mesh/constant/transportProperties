@@ -1,0 +1,40 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//Data toook by Menard 07
+phases (water air);
+Dab           Dab [0 2 -1 0 0 0 0]     1e-07;//1e-06;
+alphatab      alphatab [0 0 0 0 0 0 0] 0.7;
+
+
+water //n_dodecane
+{
+    transportModel  Newtonian;
+    nu              [0 2 -1 0 0 0 0] 1.724e-06;
+    rho             [1 -3 0 0 0 0 0] 696;
+}
+
+air //nitrogen
+{
+    transportModel  Newtonian;
+    nu              [0 2 -1 0 0 0 0] 4e-07;
+    rho             [1 -3 0 0 0 0 0] 25;
+}
+
+sigma           [1 0 -2 0 0 0 0] 0.06;
+
+
+// ************************************************************************* //

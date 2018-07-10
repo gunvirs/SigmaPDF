@@ -1,0 +1,147 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+libs
+(
+    "libkleinInflowGenerator.so"
+);
+
+
+application    stochSigmaFoam;//stoc3001;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt         	endTime;//nextWrite;//
+
+endTime         1.5e-4;//Approx 3 time the flowthrough time, then averaging
+
+deltaT          1e-8;//0.001;
+
+writeControl    adjustableRunTime;//timeStep;//
+
+writeInterval   1e-5;//1e-6;//
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  on;//
+
+maxCo           0.25;//0.05;//
+maxAlphaCo      0.25;//0.05;//
+
+maxDeltaT       1;
+
+/*
+functions
+{
+
+    fieldAverage1
+    {
+        type            fieldAverage;
+        functionObjectLibs ( "libfieldFunctionObjects.so" );
+        enabled         true;
+        outputControl   outputTime;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  on;//
+                base        time;
+            }
+            alpha.water
+            {
+                mean        on;
+                prime2Mean  on;//
+                base        time;
+            }
+            ElsaSigma
+            {
+                mean        on;
+                prime2Mean  on;//
+                base        time;
+            }
+            ElsaSigmaPrime
+            {
+                mean        on;
+                prime2Mean  on;//
+                base        time;
+            }
+            ElsaSD32
+            {
+                mean        on;
+                prime2Mean  on;//off;//
+                base        time;
+            }
+        );
+    }
+
+    probes
+    {
+        type            probes;
+        functionObjectLibs ("libsampling.so");
+        enabled         true;
+        outputControl   timeStep;
+        //outputInterval  1;
+        fields
+        (
+                p
+                U
+                alpha.water
+                alpha.waterMean//Non sono sicuro possa farlo
+		alpha1_.0
+		alpha1_.8
+		alpha1_.2
+		alpha1_.10
+        );
+        probeLocations
+        (
+            (0.0001 0 0)            //1 D
+            (0.00025 0 0)            //2.5 D
+            (0.0005 0 0)            //5 D
+            (0.001 0 0)            //10 D
+            (0.0015 0 0)            //15 D
+            (0.002 0 0)            //10 D
+            (0.0001 0.00005 0)            //1 D
+            (0.00015 0.00005 0)            //1 D
+            (0.0002 0.00005 0)            //1 D
+            (0.0001 0.0001 0)            //1 D
+            (0.00015 0.0001 0)            //1 D
+            (0.0002 0.0001 0)            //1 D
+        );
+    }
+
+
+}
+*/
+
+
+// ************************************************************************* //

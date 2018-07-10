@@ -1,0 +1,86 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+	//Creating initial Sets of face from the patch of interest
+	{
+        name    inletFaces;
+        type    faceSet;
+        action  new;
+        source  patchToFace;
+        sourceInfo
+        	{
+		name "inletL";
+        	}
+	}
+
+	//Creating initial Sets of cells from the region that I want remove 
+	//From here ......
+	{
+        name    jetCells;
+        type    cellSet;
+        action  new;
+	source  cylinderToCell;
+	sourceInfo
+		{
+		p1       (0.0000 0 0 ); // start point on cylinder axis
+		p2       (0.01 0 0 );   // end point on cylinder axis
+		radius   0.00005;
+		}
+	}
+
+	{
+	name    jetFaces;
+	type    faceSet;
+	action  new;
+	source  cellToFace;
+	sourceInfo
+		{
+		set     jetCells;
+		option  all;
+		}
+	}
+	// ...... to here
+	//Now I wanna remove some faces from the Patch of interest(PoI) to create another patch.
+	//1st: Copy all the faces from the PoI to this one
+	{
+        name    coFlowPatchFaces;
+        type    faceSet;
+        action  new;
+        source  faceToFace;
+        sourceInfo
+        	{
+		set inletFaces;
+        	}
+	}
+	//2nd: Remove from this copy the internal face that I don't need anymore
+	{
+        name    coFlowPatchFaces;
+        type    faceSet;
+        action  delete;
+        source  faceToFace;
+        sourceInfo
+        	{
+		set jetFaces;
+        	}
+	}
+
+
+);
+
+// ************************************************************************* //

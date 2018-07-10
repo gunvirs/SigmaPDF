@@ -1,0 +1,45 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      postChannelDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Seed patches to start layering from
+patches         ( wallInlet inletL );
+
+// Direction in which the layers are
+component       x;
+
+// Is the mesh symmetric? If so average(symmetric fields) or
+// subtract(asymmetric) contributions from both halves
+symmetric       false;//true;
+
+// Radius size to average
+radius		0.0002;//[m]
+
+//Precision to search value
+smallr 		0.00001; 
+smally 		1E-5;  
+
+//Axial points
+AxialPoints	(0.001 0.002 0.0005 );
+// Fields to analyze
+        fields
+        (
+            alpha.waterMean
+	    Sdev
+        );
+
+
+// ************************************************************************* //

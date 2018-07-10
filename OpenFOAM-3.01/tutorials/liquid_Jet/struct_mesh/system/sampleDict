@@ -1,0 +1,67 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      sampleDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+interpolationScheme cellPoint;//cellPointFace;//cell;//
+
+setFormat       raw;
+
+sets
+(
+    zLine
+    {
+        type    uniform;
+        axis    x;
+        start   (0 0 0);
+        end     (0.0015 0 0);
+        nPoints 200;
+    }
+
+    zSuD5
+    {
+        type    uniform;
+        axis    z;
+        start   (0.0005 0 0);
+        end     (0.0005 0 0.000225);
+        nPoints 1000;
+    }
+
+    zSuD10
+    {
+        type    uniform;
+        axis    z;
+        start   (0.001 0 0);
+        end     (0.001 0 0.000225);
+        nPoints 1000;
+    }
+
+    zSuD15
+    {
+        type    uniform;
+        axis    z;
+        start   (0.00145 0 0);
+        end     (0.00145 0 0.000225);
+        nPoints 1000;
+    }
+
+);
+
+//fields          (alpha.waterMean Sdev ElsaSigmaMean SdevSigma ElsaSigmaMeanZero SdevSigmaZero );
+//fields          (alpha.waterMean Sdev ElsaSigmaMean ElsaSigmaMeanZero );
+//fields          (alpha.water Sigma0 );
+fields          (alpha.waterMean Sigma0 Sigma1);
+
+// ************************************************************************* //

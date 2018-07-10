@@ -1,0 +1,106 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    //"alpha.water.*"
+    "alpha.*"
+    {
+		// Nel caso discretizzo usando Euler method:
+        nAlphaCorr      2;
+        nAlphaSubCycles 3;//1;
+		//Nel caso usassi crackNicolson
+	//nAlphaCorr      1;//3;//
+	//nAlphaSubCycles 1;//4;//
+        cAlpha          1;
+
+        MULESCorr       yes;
+        nLimiterIter    2;//3
+
+	solver          PCG;
+	preconditioner  DIC;
+        tolerance       1e-9;
+        relTol          0;
+    }
+
+    pcorr
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          0;
+    }
+
+    p_rgh
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          0.005;
+    }
+
+    p_rghFinal
+    {
+        $p_rgh;
+        relTol          0;
+    }
+    "ElsaSigmaPrime.*"
+    {
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-09;
+        relTol          0;
+    }
+
+/*    "(U|k|epsilon).*"
+    {
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0;
+        minIter         1;
+    }*/
+    "(U|k|epsilon|nuTilda).*"
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        tolerance       1e-09;
+        relTol          0;
+        minIter         2;
+    }
+}
+
+PIMPLE
+{
+	pRefCell  0;
+	pRefValue 0;
+
+    momentumPredictor   yes;//no;
+    nOuterCorrectors    2;//4;
+    nCorrectors         3;//3;
+    nNonOrthogonalCorrectors 0;//Incrementato numero nonort corr;
+}
+
+relaxationFactors
+{
+    equations
+    {
+        ".*"                1;//0.7;
+    }
+}
+
+// ************************************************************************* //

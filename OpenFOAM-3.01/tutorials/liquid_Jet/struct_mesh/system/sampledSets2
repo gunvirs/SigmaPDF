@@ -1,0 +1,67 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+totalLiquid
+{
+    type volumeIntegrate;
+    verbose true;
+        outputControl   timeStep;
+    fields ( alpha.water );
+}
+
+volFlow
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           outlet;
+    
+	aliases{ alpha alpha.water; }
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+}
+
+inletVolFlof
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           inletL;
+aliases{ alpha alpha.water; }
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+
+}
+
+lateralFl
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           lateral;
+aliases{ alpha alpha.water; }
+    verbose             true;
+    expression          "alpha*U&Sf()";
+    accumulations       ( sum );
+
+}
+
+gocce
+{
+    type                swakExpression;
+    valueType           patch;
+    patchName           outlet;
+//aliases{ alpha alpha.water; }
+    verbose             true;
+    //expression          "ElsaSD32*U.x*(ElsaSD32>1e-05 ? ElsaSD32 : 0 )";
+    expression          "ElsaSD32*U&Sf()*(ElsaSD32>1e-05 ? ElsaSD32 : 0 )";
+    accumulations       ( sum );
+
+}
+// ************************************************************************* //
+

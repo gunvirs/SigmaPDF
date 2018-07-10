@@ -1,0 +1,14 @@
+The two different mesh are the set up to run the liquid Jet case
+used as reference for the ELSA and the Sigma-Y-PDF , [1,2] .
+
+The first case , struct_mesh , is a structured mesh, with orthogonal cells. 
+The second case, cyl_mesh, presents a cylindrical mesh. 
+In this latter, is present the bash file blkmsh.sh to create the mesh. 
+
+It is worth noting that, to  use the Klein digital filter as inlet condition, the inlet patch MUST have a normal parallel to the axis X. This is due to a bug present in the boundary condition related. I'll fix it someday. Until then be carefoul of that. 
+
+
+Refereces:
+[1]Chesnel et al. , Atomization and Sprays, 2012, 21(9)
+[2]Navarro-Martinez , International Journal of Multiphase Flow, 2014, 63
+
